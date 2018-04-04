@@ -1,0 +1,91 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <style>
+    </style>
+    
+    <title>BN - Datos de Access</title>
+    
+    <script>
+		function accede(accion,url,fn) {
+            var xobj = new XMLHttpRequest();
+            
+//            console.log("accion: ", accion);
+//            console.log("url   : ", url);
+             
+            xobj.overrideMimeType("application/json");
+            xobj.open(accion, url, true);
+            xobj.onerror = (e) => { 
+				alert("Error del Navegador!!!\nStatus: " +xobj.status +" (" +xobj.statusText+")") 
+				console.log("Falló, Header:")
+				console.log(xobj.headers)
+			}
+            xobj.onprogress = (e) => {
+				console.log("Progress: ")
+			}
+            xobj.onreadystatechange = () => {
+                console.log("State:",xobj.readyState,"Status:", xobj.status)
+                if (xobj.readyState == 4 && xobj.status == "200") {
+                    console.log("Fifó!")
+                }
+            };
+            xobj.onload = () => { fn(JSON.parse(xobj.responseText)) };
+            xobj.send();
+        }
+        
+        function leeOfc(idOfc,mstOfc) {
+			let codigo = idOfc || document.getElementById("idOfc").value
+			
+			accede("GET", "https://localhost:3000/oficina/" + codigo,mstOfc)
+		}
+		
+		function mstOfc(Bienes) {
+			mstTabla(Bienes,"lstBienes","Oficina No. " +document.getElementById("idOfc").value)
+		}
+		
+		function mstTabla(datos,dom,caption = "") {
+			let donde = typeof dom === "string" ? document.getElementById(dom) : dom;
+			
+			let tabla = "<table><caption>" +caption+ "</caption>";
+			let titulos;
+			datos.forEach(e => {
+				if (!titulos) {
+					titulos = "<thead><tr>";
+					for (x in e) {
+						titulos += "<th>"+x+"</th>";
+					}
+					titulos += "</tr></thead>";
+					tabla += titulos+"<tbody>"; 
+				}
+				tabla +="<tr>";
+				for (x in person) {
+					tabla += "<td>" +e[x] +"</td>";
+				}
+				tabla +="</tr>";				
+			});
+			tabla += "</tbody></table>";
+			
+			donde.innerHTML = tabla;
+		}
+    </script>
+</head>
+
+<body>
+  <h1>Bienes por Oficina</h1>
+  Access-Control-Allow-Origin: * 
+  https://www.html5rocks.com/en/tutorials/cors/
+
+  <div>
+		<form>
+		  <label for="idOfc">Oficina</label>
+		  <input type="text" id="idOfc" required/>
+		  <input type="button" value="Lee Oficina" onclick="leeOfc()"/>
+		</form>
+  </div>
+  <div id="lstBienes">
+  </div>
+  
+  <footer>Elaborado por <a href="https://rafagomez.neocities.org">Rafa Gómez</a></footer>
+</body>
+</html>
