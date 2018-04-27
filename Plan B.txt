@@ -1,0 +1,134 @@
+			// https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
+			// https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
+			//   Access-Control-Allow-Origin: *
+			// https://www.html5rocks.com/en/tutorials/cors/
+*/
+
+/*
+			var prms = {
+				"async": true,
+				"crossDomain": true,
+				"url": url, // https://localhost:3000/oficina/
+				"method": accion,
+				"headers": {
+					"content-type": "application/json",
+					"cache-control": "no-cache",
+				},
+				"error": function(xhr){
+					alert("¡Error! " + xhr.status + " " + xhr.statusText);
+				},
+				"processData": (datos != undefined),
+				"data": datos
+			}
+			  
+			$.ajax(prms).done((response) => { fn(response) })
+		*/
+
+
+			
+$.ajax({
+	"async": true,
+	"crossDomain": true,
+	"url": url,
+	"method": accion,
+	"headers": {
+		"content-type": "application/json",
+		"cache-control": "no-cache",
+	},
+	"error": (xhr) => {
+		alert("¡Error del navegador!: " + xhr.status + " " + xhr.statusText);
+	},
+	"processData": conDatos,
+	"data": datos
+  }).done((response) => { fn(JSON.parse(response)) }
+});
+
+/* Otra forma:
+var data = JSON.stringify({
+  "balance": "1000000",
+  "name": "platica"
+});
+
+var xhr = new XMLHttpRequest();
+xhr.withCredentials = true;
+
+xhr.addEventListener("readystatechange", function () {
+  if (this.readyState === 4) {
+    console.log(this.responseText);
+  }
+});
+
+xhr.open("GET", "http://localhost:3000/oficina/9999");
+xhr.setRequestHeader("content-type", "application/json");
+xhr.setRequestHeader("cache-control", "no-cache");
+xhr.setRequestHeader("postman-token", "12d41531-ed38-4cff-6523-218b146e69cb");
+
+xhr.send(data);
+
+ var settings = {
+  "async": true,
+  "crossDomain": true,
+  "url": "http://localhost:3000/oficina/9999",
+  "method": "GET",
+  "headers": {
+    "content-type": "application/json",
+    "cache-control": "no-cache",
+  },
+  "error": function(xhr){
+            alert("An error occured: " + xhr.status + " " + xhr.statusText);
+        },
+  "processData": false,
+  "data": "{\"balance\": \"1000000\", \"name\": \"platica\"}\n"
+}
+
+$.ajax(settings).done(function (response) {
+	console.log("Terminó");
+  console.log(response);
+});
+
+
+**
+
+  <div>
+	   <blockquote>An origin is defined as a combination of URI scheme, host name, and port number.</blockquote>
+	  <p><strong>FireFox</strong>:<br/>Cross-Origin Request Blocked: The Same Origin Policy disallows reading the remote resource at http://localhost:3000/oficina/9999. (Reason: missing token ‘cache-control’ in CORS header ‘Access-Control-Allow-Headers’ from CORS preflight channel).</p>
+	  <p><strong>Chrome </strong>:<br/>Failed to load resource: net::ERR_CONNECTION_REFUSED</p>
+	  <p>Failed to load http://localhost:3000/oficina/9999: Request header field cache-control is not allowed by Access-Control-Allow-Headers in preflight response.</p>
+	  <p><strong>Si no actualizo res.header</strong>:<br/>Failed to load http://localhost:3000/oficina/9999: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource. Origin 'null' is therefore not allowed access.</p>
+		<p style="background-color: gray">
+			<h4>Headers</h4>
+<p>The HTTP headers that relate to CORS are</p>
+<h5>Request headers</h5>
+<ul>
+    <li>Origin</li>
+    <li>Access-Control-Request-Method</li>
+    <li>Access-Control-Request-Headers</li>
+</ul>
+<h5>Response headers</h5>
+<ul>
+    <li>Access-Control-Allow-Origin</li>
+    <li>Access-Control-Allow-Credentials</li>
+    <li>Access-Control-Expose-Headers</li>
+    <li>Access-Control-Max-Age</li>
+    <li>Access-Control-Allow-Methods</li>
+    <li>Access-Control-Allow-Headers</li>
+</ul>
+
+  <div>
+	  Prueba esto:<br/>
+	  <a href="https://www.html5rocks.com/en/tutorials/cors/">https://www.html5rocks.com/en/tutorials/cors/</a>
+  </div>
+
+	 	<!-- <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script> -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+
+
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, cache-control");
+  res.header("Access-Control-Allow-Methods", "POST", "PUT, DELETE");
+
+  next();
+});
+*/

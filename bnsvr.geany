@@ -27,9 +27,4 @@ long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=4
-FILE_NAME_0=1185;Javascript;0;EUTF-8;1;1;0;%2Fhome%2Frafa%2FDropbox%2Fproyectos%2FBienes_Nacionales%2FsvrNode%2Fbnsvr.js;0;4
-FILE_NAME_1=425;HTML;0;EUTF-8;1;1;0;%2Fhome%2Frafa%2FDropbox%2Fproyectos%2FBienes_Nacionales%2FsvrNode%2FBienes_Access.html;0;4
-FILE_NAME_2=90;HTML;0;EUTF-8;1;1;0;%2Fhome%2Frafa%2FDropbox%2Fproyectos%2FrogLib%2FEj%20json.html;0;4
-FILE_NAME_3=958;HTML;0;EUTF-8;1;1;0;%2Fhome%2Frafa%2FDropbox%2Fproyectos%2FPruebas%2FpruebaJson.html;0;4
-FILE_NAME_4=1514;JSON;0;EUTF-8;1;1;0;%2Fhome%2Frafa%2FDropbox%2Fproyectos%2FMiriadaX%2FNode%2FRespuestas.json;0;4
+current_page=0

@@ -2,90 +2,534 @@
 <html>
 <head>
 	<meta charset="utf-8">
+	<script defer src="https://use.fontawesome.com/releases/v5.0.1/js/all.js"></script>
+
     <style>
+		body {
+			--rogFondo: #0047b3;
+		}
+		.badge {
+			background-color: var(--rogFondo);
+			color: white;
+			border: 1px solid red;
+			border-radius: 12px;
+			padding: 5px;
+			margin: 10px;
+		}
+        button {
+            background-color: var(--rogFondo);
+            border: none;
+            color: white;
+            padding: 10px 20px 10px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 12px;
+            margin: 3px 2px;
+            cursor: pointer;
+        }
+        button:hover {
+		  font-weight: bold;
+        }
+		label {
+            font-style: oblique;
+            font-weight: bold;
+            width: 100px;
+        }
+        .error {color: #FF0000;}
+        .rogBtn {
+            background-color: #00https://github.com/elmasbestia/bnsvr47b3;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 12px;
+            margin: 3px 2px;
+            cursor: pointer;
+        }
+        .rogBtn:hover {
+            font-weight: bold;
+        }
+	/* Búsqueda */
+		#vntBsq {
+			margin: 10px;
+			overflow: auto;
+		}
+		#cntBsq{
+			float: right;
+			background: var(--rogFondo);
+			color: white;
+			vertical-align: middle;
+
+			overflow: hidden;
+			white-space: nowrap;
+		}
+		#Bsq {
+			background: inherit;
+			color: inherit;
+			padding: 10px;
+			width: 300px;
+			display: none;
+			
+			-webkit-transition: all .55s ease;
+			-moz-transition: all .55s ease;
+			-ms-transition: all .55s ease;
+			-o-transition: all .55s ease;
+			transition: all .55s ease;
+		}
+		#btnBsq{
+			-webkit-border-top-right-radius: 5px;
+			-webkit-border-bottom-right-radius: 5px;
+			-moz-border-radius-topright: 5px;
+			-moz-border-radius-bottomright: 5px;
+			border-top-right-radius: 5px;
+			border-bottom-right-radius: 5px;
+
+			border: 1px solid black;
+			height: 50px;
+			width: 50px;
+			color: #FFFFFF;
+			font-size: 16pt;
+		}
+		#btnBsq:hover #Bsq{
+			display: inline;
+		}
+    /* D O M */
+       #lstBienes {
+		   max-height: 500px;
+	       overflow: auto;
+	   }
+    /* F i c h a */
+       #fichaBien {
+		   	border: 1px solid blue;
+			border-radius: 12px;
+			padding: 20px;
+	   }
+	   textarea {
+		   width:  500px;
+		   height: 50px;
+	   }
+    /* T a b l a s */
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 8px;
+        }
+
+        tr:nth-child(even){background-color: #f2f2f2}
+
+        th {
+            background-color: var(--rogFondo);
+            color: white;
+        }
+	/* M O D A L */
+	.rogModal {
+			display: none; /* Hidden by default */
+			position: fixed; /* Stay in place */
+			z-index: 1; /* Sit on top */
+			left: 0;
+			top: 0;
+			width: 100%; /* Full width */
+			height: 100% /* Full Height */
+			overflow: auto; /* Enable scroll if needed */
+			background-color: rgb(0,0,0); /* Fallback color */
+			background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+		}
+	.cntModal {
+		background-color: #fefefe;
+		margin: 5% auto; /* 5% from the top and centered */
+		padding: 20px;
+		border: 1px solid #888;
+		width: 90%;
+	}
+	.rogCierraModal {
+		color: #aaa;
+		float: right;
+		font-size: 28px;
+		font-weight: bold;
+	}
+	.rogCierraModal:hover, .rogCierraModal:focus {
+		color: black;
+		text-decoration: none;
+		cursor: pointer;
+	}
     </style>
     
     <title>BN - Datos de Access</title>
     
     <script>
-		function accede(accion,url,fn) {
+		var svrURL = "http://localhost:3000/";
+//		const svrURL = "http://10.46.4.2:3000/";
+		var btnBsq, opcBsq, valBsq;
+        var btnProcede, btnEspera;
+		var ficha;
+		Estructura = {
+			Descripcion: "",
+			BN_IDEN: "",
+			Marca: "",
+			Modelo: "",
+			Color: "",
+			Serial: "",
+			BN_MES: "",
+			BN_ANO: "",
+			BN_VALOR: "0.00",
+			OC: "",
+			OC_Fecha: "",
+			Fecha_IF: "",
+			Estado: "Bueno",
+			Cuenta: "",
+			BN_OBSERV1: "",
+			BN_OBSERV2: "",
+			BN_OFIC: "",
+			Area: "",
+			Responsable: ""
+		}
+
+        function rogPrm(prm) { return (typeof prm == "object") ? prm.target.textContent : prm }
+
+		function objDom(dom) { return typeof dom === "string" ? document.getElementById(dom) : dom }
+
+        function btnDefault(dom,boton) {
+            let btn = objDom(boton);
+            let obj = objDom(dom);
+			obj.oninput = (e) => { btn.disabled = !Boolean(e.target.value) }
+            obj.onkeypress = (e) => { if(e.keyCode === 13) btn.click() }
+        }
+
+		function txtEspera() { return "<span class= 'fa-li fa fa-spinner fa-spin'></span>" }
+		
+		function txtBsq() {	return "<span class= 'fa fa-search'></span>" }
+		
+		function accede(accion,url,fn,datos) {
             var xobj = new XMLHttpRequest();
-            
-//            console.log("accion: ", accion);
-//            console.log("url   : ", url);
+
+			function xmlEstado(estado) {
+				switch (estado) {
+					case 0: return "No inicializado"	// request not initialized
+					case 1: return "Conectado" 			// server connection established
+					case 2: return "Recibido" 			// request received
+					case 3: return "Procesando"			// processing request
+					case 4: return "Listo"				// request finished and response is ready
+				}
+			}
+			
+			function msjErrorXML(e) {
+				console.log(e);
+				alert("¡E R R O R!!!\nStatus: " +xobj.status +" (" +xobj.statusText+")\n"+xobj.status)
+			}
+             
+//			if (datos) datos = JSON.stringify(datos);
              
             xobj.overrideMimeType("application/json");
             xobj.open(accion, url, true);
-            xobj.onerror = (e) => { 
-				alert("Error del Navegador!!!\nStatus: " +xobj.status +" (" +xobj.statusText+")") 
-				console.log("Falló, Header:")
-				console.log(xobj.headers)
-			}
-            xobj.onprogress = (e) => {
-				console.log("Progress: ")
-			}
-            xobj.onreadystatechange = () => {
-                console.log("State:",xobj.readyState,"Status:", xobj.status)
-                if (xobj.readyState == 4 && xobj.status == "200") {
-                    console.log("Fifó!")
-                }
-            };
-            xobj.onload = () => { fn(JSON.parse(xobj.responseText)) };
-            xobj.send();
+            xobj.onerror = msjErrorXML;
+//            xobj.onprogress = (e) => { console.log("Progress: ", e) }
+            xobj.onreadystatechange = () => { console.log(xobj.readyState, xmlEstado(xobj.readyState)," (", xobj.status,")") };
+            xobj.onload = () => {
+				if (xobj.status < 400) {
+					if(accion === "GET") {
+						fn(JSON.parse(xobj.responseText))
+					} else {
+						fn(xobj.responseText)
+					}
+				} else {
+					msjErrorXML()
+				}
+			};
+            xobj.send(datos);
         }
-        
-        function leeOfc(idOfc,mstOfc) {
-			let codigo = idOfc || document.getElementById("idOfc").value
+
+		function leeBsq(que, valor) {
+			if (que) opcBsq.value = que
+			else que = opcBsq.value;
+			if (valor) valBsq.value = valor
+			else valor = valBsq.value;
 			
-			accede("GET", "https://localhost:3000/oficina/" + codigo,mstOfc)
+			switch (que) {
+				case "BN_IDEN":
+					leeBien(valor);
+					break;
+				case "BN_OFIC":
+					leeOfc(valor);
+					break;
+				case "oficinas":
+					accede("GET", svrURL +"oficinas",(Ofcs) => { mstTabla(Ofcs,"lstBienes","Todas las Oficinas", null, leeOfc, "valor") });
+					break;
+				case "cuentas":
+					accede("GET", svrURL +"cuentas",(Ctas) => { mstTabla(Ctas,"lstBienes","Todas las Cuentas", null, leeCta, "valor") });
+					break;
+				case "tutti":
+					leeTutti();
+					break;
+				default:
+					accede("GET",svrURL+"bienes?"+que+"="+valor,mstBienes);
+			}
+		}
+
+		function leeCta (valor) { leeBsq("cuenta",valor) }
+
+		function leeBien (valor) { accede("GET", svrURL+"bien/" + rogPrm(valor), mstBien) }
+
+		function mstBien(bien) {
+			if (bien.length === 1) {
+				moveCorresponding("fichaBien",bien[0],Estructura)
+				vntBien.style.display = "block";
+			} else mstBienes(bien);
+		}
+		
+		function mstBienes(bienes) {
+			const que = opcBsq.value
+			const valor = valBsq.value
+			const campos = ["BN_OFIC", "BN_IDEN", "Descripcion", "Marca", "Modelo", "Serial", "Color"];
+			mstTabla(bienes,"lstBienes", que +" = "+valor,campos,"leeBien","BN_IDEN");
+		}
+
+        function leeTutti() {
+			accede("GET", svrURL +"Bienes",Bienes => {
+				const campos = ["BN_OFIC", "BN_IDEN", "Descripcion", "Marca", "Modelo", "Serial", "Color"];
+				mstTabla(Bienes,"lstBienes","Todos los Bienes",campos,leeBien,"BN_IDEN");
+			})
+		}
+
+        const leeOfc = (idOfc) => {
+		    accede("GET", svrURL+"oficina/" + rogPrm(idOfc), mstOfc);
 		}
 		
 		function mstOfc(Bienes) {
-			mstTabla(Bienes,"lstBienes","Oficina No. " +document.getElementById("idOfc").value)
+			const campos = ["BN_IDEN", "Descripcion", "Marca", "Modelo", "Serial", "Color"];
+			mstTabla(Bienes,"lstBienes","Oficina No. " +valBsq.value,campos,leeBien,"BN_IDEN");
+		}
+
+        function moveCorresponding(Formulario,valores,valPorOmision) {
+            var elementos = objDom(Formulario).elements;
+            var arreglo = [];
+            
+            let n = elementos.length;
+            for (let i = 0; i < n ;i++) {
+                if(valores[elementos[i].name] != undefined) elementos[i].value = valores[elementos[i].name]
+				else if(valPorOmision[elementos[i].name] != undefined) {elementos[i].value = valPorOmision[elementos[i].name]}
+            }
+        }
+        
+		function leeFicha(agrega) {
+			var elementos = ficha.elementos;
+			var campos = {};
+			let accion, ruta;
+
+            iniProcede();
+            
+			for (x in Estructura) { campos[x] = elementos[x].value; }
+
+agrega = true;
+campos.BN_OFIC = "Rafa";
+			
+			if(agrega) {
+                accion = "POST";
+                ruta = "bien";
+			} else {
+                accion = "PUT";
+                ruta = "bien/"+campos.BN_IDEN;
+			}
+            accede(accion, svrURL+ruta, (resp) => { finProcede(resp) }, campos)
 		}
 		
-		function mstTabla(datos,dom,caption = "") {
-			let donde = typeof dom === "string" ? document.getElementById(dom) : dom;
+        function iniProcede () {
+//            btnEspera.style.display = "inline";
+			btnProcede.cursor = "wait";
+            btnProcede.disabled = true;
+        }
+        function finProcede(resp) {
+            alert("Llegó la respuesta: "+resp);
+
+//            btnEspera.style.display = "none";
+			btnProcede.cursor = "default";
+            btnProcede.disabled = false;
+            cierraFicha();
+        }
+        
+		function cierraFicha() { ficha.style.display = "none"; }
+
+		function creaOpcion(item) {
+			var opcion = document.createElement("OPTION");
 			
-			let tabla = "<table><caption>" +caption+ "</caption>";
-			let titulos;
+			if (typeof item === "string") {
+				opcion.value = item
+				opcion.appendChild(document.createTextNode(item))
+			} else {
+				opcion.value = item.valor
+				opcion.appendChild(document.createTextNode(item.texto));
+			}
+			return opcion;
+		}
+		
+		function leeMarcas() {
+			accede("GET", svrURL+"Marcas",(Marcas) => {
+				let cmbMarcas = document.getElementById("Marca");
+			
+				Marcas.map(x => { cmbMarcas.appendChild(creaOpcion(x.valor)) });
+			});
+		}
+		
+		function mstTabla(datos,dom,caption = "",lista,Fn,nbId="") {
+			let donde = objDom(dom);
+
+//			function celda(valor,nb) { return "<td"+ (nb === nbId ? llamada(valor) : "")+">" + (valor || "") +"</td>" }
+//			llamada = Boolean(nbFn) ? (valor) => " ondblclick='" +nbFn +"()'" : () => "";
+			function celda(valor,nb) { return "<td"+ (nb === nbId ? " class='rogId'"	: "")+">" + (valor || "") +"</td>" }
+			
+			let tabla = "<table><caption><h3>" +caption+ "<sup><span class='badge'>"+datos.length+"</span></sup></h3></caption>";
+			let titulos, linea;
+			
 			datos.forEach(e => {
 				if (!titulos) {
 					titulos = "<thead><tr>";
-					for (x in e) {
-						titulos += "<th>"+x+"</th>";
+					if(lista) {
+						lista.map((x) => {
+							titulos += "<th>"+x+"</th>";
+						})
+						linea = (x,lista) => {
+							lista.map((nbCampo) => {
+								tabla += celda(x[nbCampo],nbCampo)
+							})
+						}
+					} else {
+						for (x in e) {
+							titulos += "<th>"+x+"</th>";
+						}
+						linea = (e,lista) => {
+							for (x in e) {
+								tabla += celda(e[x],x);
+							}
+						}
 					}
 					titulos += "</tr></thead>";
-					tabla += titulos+"<tbody>"; 
+					tabla += titulos+"<tbody>";
 				}
 				tabla +="<tr>";
-				for (x in person) {
-					tabla += "<td>" +e[x] +"</td>";
-				}
-				tabla +="</tr>";				
+				linea (e,lista);
+				tabla +="</tr>";
 			});
 			tabla += "</tbody></table>";
 			
 			donde.innerHTML = tabla;
+			if (Fn) {
+				let i = 0;
+				let rogIds = document.getElementsByClassName("rogId");
+				let nRogIds = rogIds.length;
+				for(; i < nRogIds; i++ ) {
+					rogIds[i].onclick = Fn;
+					rogIds[i].cursor = "pointer";
+				}
+			}
+		}
+
+		function Debut() {
+			leeMarcas();
+			
+			// Prepara forma de búsqueda
+			btnBsq = objDom("btnBsq");
+			opcBsq = objDom("opcBsq");
+			valBsq = objDom("valBsq");
+
+			opcBsq.oninput = () => { if(opcBsq[opcBsq.selectedIndex].classList.contains("sinValBsq")) leeBsq() }
+			btnBsq.onmouseover = () => { objDom("Bsq").style.display = "inline"; }
+			btnDefault(valBsq,btnBsq);
+
+			// Formulario
+			ficha = objDom('vntBien');
+			ficha.elementos = objDom("fichaBien").elements;
+            btnProcede = objDom("btnProcede");
 		}
     </script>
 </head>
 
-<body>
-  <h1>Bienes por Oficina</h1>
-  Access-Control-Allow-Origin: * 
-  https://www.html5rocks.com/en/tutorials/cors/
+<body onload="Debut()">
+	<h1>Bienes Nacionales</h1>
 
-  <div>
-		<form>
-		  <label for="idOfc">Oficina</label>
-		  <input type="text" id="idOfc" required/>
-		  <input type="button" value="Lee Oficina" onclick="leeOfc()"/>
-		</form>
-  </div>
-  <div id="lstBienes">
-  </div>
-  
-  <footer>Elaborado por <a href="https://rafagomez.neocities.org">Rafa Gómez</a></footer>
+	<div>
+		<div id="vntBsq">
+		  <div id="cntBsq">
+			<div id="Bsq">
+				<select name="opcBsq" id="opcBsq">
+					<option value="BN_OFIC">Oficina</option>
+					<option value="BN_IDEN">Nro. de Bien</option>
+					<option value="Descripcion">Descripción</option>
+					<option value="Marca">Marca</option>
+					<option value="cuenta">Cuenta</option>
+					<option value="oficinas" class="sinValBsq">Todas las Oficinas</option>
+					<option value="cuentas" class="sinValBsq">Todas las Cuentas</option>
+					<option value="tutti" class="sinValBsq">Todos los Bienes</option>
+				</select>
+				<input type="text" id="valBsq"/>
+			</div>
+			<button id="btnBsq" onclick="leeBsq()"><i class="fa fa-search"></i></button>
+		  </div>
+		</div>
+	</div>
+	<div id="lstBienes">
+	</div>
+	<hr/>
+	<div id="vntBien" class="rogModal">
+		<div class="cntModal">
+			<span class="rogCierraModal" onclick="cierraFicha()">&times;</span>
+			<form id="fichaBien">
+				<label for="Descripcion">Descripción</label>
+				<textarea name="Descripcion" required></textarea>
+				<label for="BN_IDEN">Nro. Bien Nacional</label>
+				<input type="text" name="BN_IDEN" required/><br/>
+				<fieldset>
+					<label for="Marca">Marca</label>
+					<label for="Modelo">Modelo</label>
+					<label for="Color">Color</label>
+					<label for="Serial">Serial</label><br/>
+					<select name="Marca" id="Marca"></select>
+					<input type="text" name="Modelo"/>
+					<input type="text" name="Color"/>
+					<input type="text" name="Serial"/><br/>
+				</fieldset>
+				<fieldset>
+					<legend>Información Admtiva.</legend>
+					<label for="BN_MES">Mes</label>
+					<label for="BN_ANO">Año</label>
+					<label for="BN_VALOR">Valor</label><br/>
+					<input type="number" name="BN_MES" min="1" max="12"/>
+					<input type="number" name="BN_ANO"/>
+					<input type="number" name="BN_VALOR"/><br/>
+					<label for="OC">O.C.</label>
+					<label for="OC_Fecha">Fecha O.C.</label>
+					<label for="Fecha_IF">Fecha I.F.</label>
+					<label for="Estado">Estado</label>
+					<label for="Cuenta">Cuenta</label><br/>
+					<input type="text" name="OC"/>
+					<input type="date" name="OC_Fecha"/>
+					<input type="date" name="Fecha_IF"/>
+					<input type="text" name="Estado"/>
+					<input type="text" name="Cuenta" id="Cuenta" required/><br/>
+				</fieldset>
+				<fieldset>
+					<legend>Observaciones</legend>
+					<textarea class="memo" name="BN_OBSERV1"></textarea>
+					<textarea class="memo" name="BN_OBSERV2"></textarea><br/>
+				</fieldset>
+				<label for="BN_OFIC">Oficina</label>
+				<input type="text" name="BN_OFIC"/>
+				<label for="Area">Área</label>
+				<input type="text" name="Area"/>
+				<label for="Responsable">Responsable</label>
+				<input type="text" name="Responsable"/>
+			</form>
+<!--            <button id="Espera"><span class= 'fa-li fa fa-spinner fa-spin'></span></button> -->
+			<button onclick="leeFicha()" id="btnProcede">Dale duro</button>
+			<button onclick="cierraFicha()">Cancela</button>
+		</div>
+	</div>
+
+    <footer>Elaborado por <a href="https://rafagomez.neocities.org">Rafa Gómez</a></footer>
 </body>
 </html>
